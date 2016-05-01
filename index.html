@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Studio Enabler Required -->
+  <script src="https://s0.2mdn.net/ads/studio/Enabler.js" type="text/javascript"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <style type="text/css">
+    .banner {
+      background: #fff;
+      border: 1px solid black;
+      box-sizing: border-box;
+      cursor: pointer;
+      height: 250px;
+      left: 50%;
+      margin-left: -150px;
+      margin-top: -125px;
+      overflow: hidden;
+      position: relative;
+      position: absolute;
+      top: 50%;
+      width: 300px;
+    }
+  </style>
+  <script language="javascript">
+    // Initialize Enabler
+    if (Enabler.isInitialized()) {
+      init();
+    } else {
+      Enabler.addEventListener(studio.events.StudioEvent.INIT, init);
+    }
+    // Run when Enabler is ready
+    function init(){
+      if(Enabler.isPageLoaded()){
+        politeInit();
+      }else{
+        Enabler.addEventListener(studio.events.StudioEvent.PAGE_LOADED, politeInit);
+      }
+    }
+
+    function politeInit(){
+      /**
+       * Uncomment this when you have the banner.js and style.css files
+       *
+      // Load in Javascript
+      var extJavascript = document.createElement('script');
+      extJavascript.setAttribute('type', 'text/javascript');
+      extJavascript.setAttribute('src', Enabler.getUrl('banner.js'));
+      document.getElementsByTagName('head')[0].appendChild(extJavascript);
+
+      // Load in CSS
+      var extCSS=document.createElement('link');
+      extCSS.setAttribute('rel', 'stylesheet');
+      extCSS.setAttribute('type', 'text/css');
+      extCSS.setAttribute('href', Enabler.getUrl('stylesheet.css'));
+      document.getElementsByTagName('head')[0].appendChild(extCSS);
+      document.getElementById('container_dc').style.opacity=1;
+      document.getElementById('loading_image_dc').style.opacity=0;
+      document.getElementById('container_dc').style.display = 'block';
+      */
+    }
+  </script>
+
+  <script>
+    function makeRequest (method, url) {
+      return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        xhr.onload = function () {
+          if (this.status >= 200 && this.status < 300) {
+            resolve(xhr.responseXML);
+          } else {
+            reject({
+              status: this.status,
+              statusText: xhr.statusText
+            });
+          }
+        };
+        xhr.onerror = function () {
+          reject({
+            status: this.status,
+            statusText: xhr.statusText
+          });
+        };
+        xhr.send();
+      });
+    }
+    /**
+     * https://www.exec-appointments.com/widget/jobs/;i=1
+     * This URL doesn't allow CORS, you will need to mirror it someplace else.
+     */
+    makeRequest('GET', 'mirroredXML/')
+    .then(function (data) {
+      var jobs = data.getElementsByTagName('Job');
+      var feedJobTitle = document.querySelector('.feed--job-title');
+      var feedJobLocation = document.querySelector('.feed--job-location');
+      if (typeof jobs[0] === "object") {
+        feedJobTitle.innerHTML = jobs[0].childNodes[3].innerHTML;
+        feedJobLocation.innerHTML = jobs[0].childNodes[5].innerHTML;
+      }
+    })
+    .catch(function (err) {
+      console.error('Error: ', err.statusText);
+    });
+  </script>
+</head>
+<body>
+  <div class="banner">
+    <h1 class="feed--job-title"></h1>
+    <span class="feed--job-location"></span>
+  </div>
+</body>
+</html>
